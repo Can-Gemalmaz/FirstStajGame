@@ -22,7 +22,6 @@ public class GameManager : MonoBehaviour
     int bestScore;
     private void Awake()
     {
-        SaveSystem.Init();
         playAgainButton.onClick.AddListener(() =>
         {
            gameSettings.SetActive(false);
@@ -47,7 +46,8 @@ public class GameManager : MonoBehaviour
         }
 
         player.OnPlayerDead += OnPlayerDeadEvent;
-        Load();
+        //Load();
+        LoadPrefs();
     }
 
     private void OnPlayerDeadEvent(int obj, int candy)
@@ -58,9 +58,9 @@ public class GameManager : MonoBehaviour
         candyBoard.text = ("Total Candy: " + candyCount);
         if(bestScore < obj)
         {
-            Debug.Log("BestScore before save: " + bestScore);
             bestScore = obj;
-            Save();
+            //Save();
+            SavePrefs();
         }
         else
         {
@@ -79,42 +79,13 @@ public class GameManager : MonoBehaviour
 
     }
 
-    private void Save()
+    private void SavePrefs()
     {
-        SaveObject saveObject = new SaveObject {
-            scoreAmount = bestScore,
-        };
-
-        string json = JsonUtility.ToJson(saveObject);
-
-        SaveSystem.Save(json);
+        PlayerPrefs.SetInt("int_bestScore", bestScore);
     }
 
-    private void Load()
+    private void LoadPrefs()
     {
-        string saveString = SaveSystem.Load();
-        if(saveString != null) 
-        {
-            SaveObject saveObject = JsonUtility.FromJson<SaveObject>(saveString);
-
-            bestScore = saveObject.scoreAmount;
-            Debug.Log("SavedObjectBestScore"+ bestScore);
-            Debug.Log("SavedObjectSavedOne" + saveObject.scoreAmount);
-
-        }
-        else 
-        {
-            Debug.Log("No save");
-        }
-
-
-    }
-
-
-
-    private class SaveObject
-    {
-        public int scoreAmount;
-
+        bestScore = PlayerPrefs.GetInt("int_bestScore", 0);
     }
 }
